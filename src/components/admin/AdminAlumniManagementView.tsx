@@ -7,13 +7,9 @@ import {
   Clock3,
   ExternalLink,
   GraduationCap,
-  Briefcase,
   Search,
   Users,
-  XCircle,
-  Sparkles,
-  Award,
-  ShieldCheck
+  Sparkles
 } from 'lucide-react';
 
 import type { Alumni } from '../../api/alumniApi';

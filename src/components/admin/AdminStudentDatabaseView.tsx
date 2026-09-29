@@ -272,7 +272,7 @@ export const AdminStudentDatabaseView: React.FC<AdminStudentDatabaseViewProps> =
                       </div>
                       <div className="flex flex-col gap-0.5">
                         <p className="font-extrabold text-slate-900 text-base font-display leading-tight">{student.name}</p>
-                        <p className="text-xs text-slate-500 font-medium">{student.email}</p>
+                        <p className="text-xs text-slate-500 font-medium">{student.email}{student.phone ? ` • 📞 ${student.phone}` : ''}</p>
                       </div>
                     </div>
                   </td>
@@ -394,7 +394,7 @@ export const AdminStudentDatabaseView: React.FC<AdminStudentDatabaseViewProps> =
                 </div>
                 <div>
                   <h3 className="font-bold text-slate-900 text-lg font-display">{activeMobileStudent.name}</h3>
-                  <p className="text-xs text-slate-500 font-medium">{activeMobileStudent.email}</p>
+                  <p className="text-xs text-slate-500 font-medium">{activeMobileStudent.email}{activeMobileStudent.phone ? ` • 📞 ${activeMobileStudent.phone}` : ''}</p>
                 </div>
               </div>
               <button

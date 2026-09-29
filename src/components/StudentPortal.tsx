@@ -117,6 +117,9 @@ export const StudentPortal: React.FC<StudentPortalProps> = ({
    */
   const [profileName, setProfileName] = useState(currentStudent.name);
   const [profileEmail, setProfileEmail] = useState(currentStudent.email);
+  const [profilePhone, setProfilePhone] = useState(
+    currentStudent.phone || '9876543210'
+  );
   const [profilePassword, setProfilePassword] = useState(
     currentStudent.password || ''
   );
@@ -170,6 +173,7 @@ export const StudentPortal: React.FC<StudentPortalProps> = ({
   useEffect(() => {
     setProfileName(currentStudent.name);
     setProfileEmail(currentStudent.email);
+    setProfilePhone(currentStudent.phone || '9876543210');
     setProfilePassword(currentStudent.password || '');
     setProfileBranch(currentStudent.department);
     setProfileCgpa(currentStudent.cgpa.toString());
@@ -300,8 +304,31 @@ export const StudentPortal: React.FC<StudentPortalProps> = ({
   /*
    * Save profile
    */
-  const handleSaveProfile = (e: React.FormEvent) => {
+  const handleSaveProfile = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    const cleanedName = profileName.trim();
+    if (!/^[a-zA-Z ]+$/.test(cleanedName)) {
+      alert('Name must contain only letters and spaces.');
+      return;
+    }
+
+    const cleanedEmail = profileEmail.trim();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanedEmail)) {
+      alert('Please enter a valid email address.');
+      return;
+    }
+
+    const cleanedPhone = profilePhone.trim();
+    if (!/^[6-9]\d{9}$/.test(cleanedPhone)) {
+      alert('Mobile number must be a valid 10-digit number starting with 6, 7, 8, or 9.');
+      return;
+    }
+
+    if (profilePassword && profilePassword.trim().length > 0 && profilePassword.trim().length < 6) {
+      alert('Password must be at least 6 characters long.');
+      return;
+    }
 
     const cgpaNum = parseFloat(profileCgpa);
 
@@ -317,27 +344,36 @@ export const StudentPortal: React.FC<StudentPortalProps> = ({
       return;
     }
 
-    const id12 = currentStudent.id.length === 12 ? currentStudent.id : (currentStudent.id.replace(/\D/g, '').padStart(12, '0')).slice(-12);
-    studentApi.update({
-      id: id12,
-      name: profileName.trim(),
-      email: profileEmail.trim(),
-      password: profilePassword || "password123",
-      phone: currentStudent.phone || "9876543210",
-      department: profileBranch,
-      activeBacklogs: backlogsNum,
-      resumeUrl: profileResume || "https://example.com/resume.pdf",
-      year: currentStudent.year || 4,
-      cgpa: cgpaNum
-    }).catch((err) => {
+    const studentRegDigits = (currentStudent.registrationNumber || currentStudent.id).replace(/\D/g, '');
+    const id12 = studentRegDigits.length === 12 ? studentRegDigits : (studentRegDigits.length > 0 ? studentRegDigits.padStart(12, '0').slice(-12) : '241000110549');
+
+    const validPassword = (profilePassword && profilePassword.trim().length >= 6)
+      ? profilePassword.trim()
+      : (currentStudent.password && currentStudent.password.length >= 6 ? currentStudent.password : 'password123');
+
+    try {
+      await studentApi.update({
+        id: id12,
+        name: cleanedName,
+        email: cleanedEmail,
+        password: validPassword,
+        phone: cleanedPhone,
+        department: profileBranch,
+        activeBacklogs: backlogsNum,
+        resumeUrl: (profileResume && profileResume.trim().length > 0) ? profileResume.trim() : "https://example.com/resume.pdf",
+        year: Math.min(4, Math.max(1, Number(currentStudent.year || 4))),
+        cgpa: cgpaNum
+      });
+    } catch (err: any) {
       console.warn('Backend student update failed or offline:', err);
-    });
+    }
 
     const updatedStudent: Student = {
       ...currentStudent,
-      name: profileName.trim(),
-      email: profileEmail.trim(),
-      password: profilePassword,
+      name: cleanedName,
+      email: cleanedEmail,
+      phone: cleanedPhone,
+      password: validPassword,
       department: profileBranch,
       cgpa: cgpaNum,
       backlogs: backlogsNum,
@@ -505,6 +541,8 @@ const TAB_LABELS: Record<StudentTabType, string> = {
                 setProfileName={setProfileName}
                 profileEmail={profileEmail}
                 setProfileEmail={setProfileEmail}
+                profilePhone={profilePhone}
+                setProfilePhone={setProfilePhone}
                 profilePassword={profilePassword}
                 setProfilePassword={setProfilePassword}
                 profileBranch={profileBranch}

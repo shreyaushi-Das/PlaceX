@@ -20,7 +20,8 @@ import {
   Briefcase,
   ExternalLink,
   CheckCircle2,
-  Clock3
+  Clock3,
+  Phone
 } from 'lucide-react';
 
 import type { Student, Recruiter } from '../mockData';
@@ -134,6 +135,7 @@ export const Auth: React.FC<AuthProps> = ({
   const [regEmail, setRegEmail] = useState('');
   const [regRegistrationNumber, setRegRegistrationNumber] = useState('');
   const [regPassword, setRegPassword] = useState('');
+  const [regPhone, setRegPhone] = useState('9876543210');
 
   const [regBranch, setRegBranch] = useState<
     | 'Computer Science'
@@ -262,11 +264,18 @@ export const Auth: React.FC<AuthProps> = ({
       !regName.trim() ||
       !regEmail.trim() ||
       !regRegistrationNumber.trim() ||
-      !regPassword
+      !regPassword ||
+      !regPhone.trim()
     ) {
       setError(
         'Please fill in all required fields.'
       );
+      return;
+    }
+
+    const cleanedPhone = regPhone.trim();
+    if (!/^[6-9]\d{9}$/.test(cleanedPhone)) {
+      setError('Mobile number must be a valid 10-digit number starting with 6, 7, 8, or 9.');
       return;
     }
 
@@ -337,6 +346,8 @@ export const Auth: React.FC<AuthProps> = ({
 
       email: normalizedEmail,
 
+      phone: cleanedPhone,
+
       registrationNumber: numericRegNo,
 
       password: regPassword,
@@ -376,7 +387,7 @@ export const Auth: React.FC<AuthProps> = ({
         name: newStudent.name,
         email: newStudent.email,
         password: newStudent.password || 'password123',
-        phone: '9876543210',
+        phone: cleanedPhone,
         department: newStudent.department,
         resumeUrl: newStudent.resumeText || 'https://example.com/resume.pdf',
         year: 4,
@@ -1235,7 +1246,7 @@ export const Auth: React.FC<AuthProps> = ({
 
                       </div>
 
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-3">
 
                         <div className="auth-input-group">
 
@@ -1260,6 +1271,36 @@ export const Auth: React.FC<AuthProps> = ({
                                 )
                               }
                               placeholder="user@univ.edu"
+                              className="auth-input-field"
+                            />
+
+                          </div>
+                        </div>
+
+                        <div className="auth-input-group">
+
+                          <label className="auth-input-label">
+                            Mobile Number
+                          </label>
+
+                          <div className="auth-input-box">
+
+                            <Phone
+                              size={16}
+                              className="auth-input-icon"
+                            />
+
+                            <input
+                              type="tel"
+                              required
+                              maxLength={10}
+                              value={regPhone}
+                              onChange={(e) =>
+                                setRegPhone(
+                                  e.target.value.replace(/\D/g, '').slice(0, 10)
+                                )
+                              }
+                              placeholder="9876543210"
                               className="auth-input-field"
                             />
 

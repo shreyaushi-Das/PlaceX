@@ -214,6 +214,7 @@ export interface StudentWithPlacement {
   id: string;
   name: string;
   email: string;
+  phone?: string;
   registrationNumber?: string;
   department: string;
   cgpa: number;

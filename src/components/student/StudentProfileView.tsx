@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { UserCheck, FileText, Upload, Save, CheckCircle2, Sparkles, AlertCircle, Loader2, Mail } from 'lucide-react';
+import { UserCheck, FileText, Upload, Save, CheckCircle2, Sparkles, AlertCircle, Loader2, Mail, Phone } from 'lucide-react';
 import { studentApi } from '../../api/studentApi';
 
 interface StudentProfileViewProps {
@@ -12,6 +12,8 @@ interface StudentProfileViewProps {
   setProfileName: (v: string) => void;
   profileEmail: string;
   setProfileEmail: (v: string) => void;
+  profilePhone: string;
+  setProfilePhone: (v: string) => void;
   profilePassword: string;
   setProfilePassword: (v: string) => void;
   profileBranch: string;
@@ -44,6 +46,8 @@ export const StudentProfileView: React.FC<StudentProfileViewProps> = ({
   setProfileName,
   profileEmail,
   setProfileEmail,
+  profilePhone,
+  setProfilePhone,
   profilePassword,
   setProfilePassword,
   profileBranch,
@@ -174,7 +178,22 @@ export const StudentProfileView: React.FC<StudentProfileViewProps> = ({
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+            <div className="flex flex-col gap-2">
+              <label className="text-sm font-bold text-slate-700 flex items-center gap-1.5">
+                <Phone size={15} className="text-blue-600" /> Mobile Number
+              </label>
+              <input
+                type="tel"
+                required
+                maxLength={10}
+                value={profilePhone}
+                onChange={(e) => setProfilePhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
+                placeholder="9876543210"
+                className="input-field font-mono"
+              />
+            </div>
+
             <div className="flex flex-col gap-2">
               <label className="text-sm font-bold text-slate-700">Password</label>
               <input

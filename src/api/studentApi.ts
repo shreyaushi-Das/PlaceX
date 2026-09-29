@@ -18,7 +18,7 @@ function normalizeDepartment(dept?: string): string {
   if (d === "ece" || d === "eee" || d.includes("electronics")) return "Electronics";
   if (d === "mech" || d.includes("mechanical")) return "Mechanical";
   if (d.includes("electrical")) return "Electrical";
-  return dept;
+  return "Computer Science";
 }
 
 export const studentApi = {
@@ -36,8 +36,8 @@ export const studentApi = {
       phone: data.phone,
       department: normalizeDepartment(data.department),
       activeBacklogs: Number(data.activeBacklogs ?? 0),
-      resumeUrl: data.resumeUrl,
-      year: Number(data.year ?? 4),
+      resumeUrl: (data.resumeUrl && data.resumeUrl.trim().length > 0) ? data.resumeUrl : "https://example.com/resume.pdf",
+      year: Math.min(4, Math.max(1, Number(data.year ?? 4))),
       cgpa: cgpaVal,
     };
     return request<StudentResponse>("/students/add", {
@@ -48,15 +48,17 @@ export const studentApi = {
 
   update: (data: StudentRequest) => {
     const cgpaVal = Number(data.cgpa ?? data.CGPA ?? 0);
+    const passwordVal = (data.password && data.password.trim().length >= 6) ? data.password.trim() : "password123";
     const payload: Record<string, any> = {
       id: data.id,
       name: data.name,
       email: data.email,
+      password: passwordVal,
       phone: data.phone,
       department: normalizeDepartment(data.department),
       activeBacklogs: Number(data.activeBacklogs ?? 0),
-      resumeUrl: data.resumeUrl,
-      year: Number(data.year ?? 4),
+      resumeUrl: (data.resumeUrl && data.resumeUrl.trim().length > 0) ? data.resumeUrl : "https://example.com/resume.pdf",
+      year: Math.min(4, Math.max(1, Number(data.year ?? 4))),
       cgpa: cgpaVal,
     };
     return request<StudentResponse>("/students/update", {
@@ -106,6 +108,7 @@ export const studentApi = {
         id: s.id,
         name: s.name,
         email: s.email,
+        phone: s.phone,
         department: s.department,
         cgpa: s.cgpa ?? s.CGPA ?? 0,
         backlogs: s.activeBacklogs,
